@@ -17,6 +17,7 @@ import java.time.LocalDate;
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // Add this primary key back!
     private String name;
     private String lastName;
     private String email;
@@ -32,5 +33,6 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
+
 
 }
