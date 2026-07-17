@@ -46,6 +46,17 @@ public class EmployeeServices {
     public List<Employee> getEmployeesByDepartment(Long departmentId) {
         return employeeRepository.findByDepartmentId(departmentId);
     }
+    // ⬇️ PASTE THIS NEW METHOD HERE ⬇️
+    public Employee assignDepartmentToEmployee(Long employeeId, Long departmentId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + employeeId));
+
+        Department department = departmentRepository.findById(departmentId)
+                .orElseThrow(() -> new RuntimeException("Department not found with id: " + departmentId));
+
+        employee.setDepartment(department);
+        return employeeRepository.save(employee);
+    }
 
     // 5. Delete an employee
     public void deleteEmployee(Long id) {
