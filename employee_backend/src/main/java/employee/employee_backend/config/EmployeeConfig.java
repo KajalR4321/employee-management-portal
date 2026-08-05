@@ -17,14 +17,13 @@ public class EmployeeConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for easier Postman testing
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated() // All endpoints require login
-                )
-                .httpBasic(Customizer.withDefaults()); // Enable Basic Authentication popup/headers
 
-        return http.build();
+            http.csrf(csrf -> csrf.disable())
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/api/employees/**", "/api/leaves/**").permitAll() // 👈 ADD /api/leaves/** HERE
+                            .anyRequest().authenticated()
+                    );
+            return http.build();
     }
 
     @Bean

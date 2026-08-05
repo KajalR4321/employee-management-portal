@@ -1,29 +1,48 @@
 package services;
 import entity.Department;
+import dto.DepartmentDto;
+import exception.ResourceNotFound;
+import mapper.DepartmentMapper;
 import repositary.DepartmentRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class DepartmentServices {
     private final DepartmentRepo departmentRepository;
 
-    // 1. Create a new department
-    public Department createDepartment(Department department){
-        return departmentRepository.save(department);
+    public DepartmentDto createDepartment(DepartmentDto departmentDto) {
+        Department department = DepartmentMapper.mapToDepartment(departmentDto);
+        Department savedDepartment = departmentRepository.save(department);
+        return DepartmentMapper.mapToDepartmentDto(savedDepartment);
+    }
+    // 2. Get Department by ID
+    public DepartmentDto getDepartmentById(Long id) {
+        Department department = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFound("Department not found with id: " + id));
+        return DepartmentMapper.mapToDepartmentDto(department);
     }
 
-    // 2. Get all departments (FIXED NAME HERE)
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
+    // 3. Get All Departments
+    public List<DepartmentDto> getAllDepartments() {
+        List<Department> departments = departmentRepository.findAll();
+        return departments.stream()
+                .map(DepartmentMapper::mapToDepartmentDto)
+                .collect(Collectors.toList());
     }
+    // 4. Update Department
+    public DepartmentDto updateDepartment(Long id, DepartmentDto updatedDto) {
+        Department existingDept = departmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFound("Cannot update. Department not found with id: " + id));
 
-    // 3. Find a department by ID
-    public Department getDepartmentById(Long id) {
-        return departmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Department not found with id: " + id));
+        existingDept.setDepartmentName(updatedDto.getDepartmentName());
+        existingDept.setDepartmentDescription(updatedDto.getDepartmentDescription());
+
+        Department savedDept = departmentRepository.save(existingDept);
+        return DepartmentMapper.mapToDepartmentDto(savedDept);
     }
 
     // 4. Delete a department

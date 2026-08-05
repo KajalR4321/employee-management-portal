@@ -2,6 +2,8 @@ package entity;
 import enums.EmployeeStatus;
 import enums.Role;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.context.support.BeanDefinitionDsl;
 
@@ -35,4 +37,6 @@ public class Employee {
     private Department department;
 
 
+    public void getEmail(@NotBlank(message = "Employee email must not be blank") @Email(message = "Email should be valid (e.g. user@example.com)") String email) {
+    }
 }

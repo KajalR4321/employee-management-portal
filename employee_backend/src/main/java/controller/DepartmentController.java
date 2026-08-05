@@ -1,44 +1,59 @@
 package controller;
-import entity.Department;
-import services.DepartmentServices;
+
+import dto.DepartmentDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import services.DepartmentServices;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/departments")
-@RequiredArgsConstructor // Injecting DepartmentService via Lombok
-
+@RequiredArgsConstructor
 public class DepartmentController {
-    private final DepartmentServices departmentServices;
-    // 1. Create a new Department
-    // POST http://localhost:8080/api/departments
-    public ResponseEntity<Department> createDepartment(@RequestBody Department department) {
-        Department created = departmentServices.createDepartment(department);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
-    }
-    //2. Get all Departments
-    // GET http://localhost:8080/api/departments
-    @GetMapping
-    public ResponseEntity<List<Department>> getAllDepartments() {
-        List<Department> departments = departmentServices.getAllDepartments();
-        return ResponseEntity.ok(departments);
-    }
-    // 3. Get a single Department by ID
-    // GET http://localhost:8080/api/departments/{id}
-    @GetMapping("/{id}")
-    public ResponseEntity<Department> getDepartmentById(@PathVariable Long id) {
-        Department department = departmentServices.getDepartmentById(id);
-        return ResponseEntity.ok(department);
+
+    private final DepartmentServices departmentService;
+
+    // 1. Create Department
+    // POST http://localhost:8000/api/departments
+    @PostMapping
+    public ResponseEntity<DepartmentDto> createDepartment(@Valid @RequestBody DepartmentDto departmentDto) {
+        DepartmentDto savedDept = departmentService.createDepartment(departmentDto);
+        return new ResponseEntity<>(savedDept, HttpStatus.CREATED);
     }
 
-    // 4. Delete a Department
-    // DELETE http://localhost:8080/api/departments/{id}
+    // 2. Get Department by ID
+    // GET http://localhost:8000/api/departments/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable Long id) {
+        return ResponseEntity.ok(departmentService.getDepartmentById(id));
+    }
+
+    // 3. Get All Departments
+    // GET http://localhost:8000/api/departments
+    @GetMapping
+    public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
+        return ResponseEntity.ok(departmentService.getAllDepartments());
+    }
+
+    // 4. Update Department
+    // PUT http://localhost:8000/api/departments/{id}
+    @PutMapping("/{id}")
+    public ResponseEntity<DepartmentDto> updateDepartment(
+            @PathVariable Long id,
+            @Valid @RequestBody DepartmentDto departmentDto) {
+        DepartmentDto updatedDept = departmentService.updateDepartment(id, departmentDto);
+        return ResponseEntity.ok(updatedDept);
+    }
+
+    // 5. Delete Department
+    // DELETE http://localhost:8000/api/departments/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDepartment(@PathVariable Long id) {
-        departmentServices.deleteDepartment(id);
+        departmentService.deleteDepartment(id);
         return ResponseEntity.ok("Department deleted successfully with id: " + id);
     }
 }
