@@ -24,6 +24,9 @@ public class EmployeeDto {
     @NotBlank(message = "Phone number must not be blank")
     @Size(min = 10,  message = "Phone number must be between 10 digits")
     private String phone;
+    private String designation;
+
 
     private Long departmentId;
+    private String departmentName;
 }

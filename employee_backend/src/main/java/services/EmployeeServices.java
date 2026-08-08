@@ -31,10 +31,13 @@ public class EmployeeServices {
         Employee employee = EmployeeMapper.mapToEmployee(employeeDto);
 
         // Verify and attach department if departmentId is provided
-        if (employeeDto.getDepartmentId() != null) {
-            Long deptId = employeeDto.getDepartmentId();
-            Department dept = departmentRepository.findById(deptId)
-                    .orElseThrow(() -> new ResourceNotFound("Assigned department not found with id: " + deptId));
+        // Verify and attach department if departmentName is provided
+        if (employeeDto.getDepartmentName() != null) {
+            Department dept = departmentRepository
+                    .findByDepartmentName(employeeDto.getDepartmentName())
+                    .orElseThrow(() -> new ResourceNotFound(
+                            "Department not found: " + employeeDto.getDepartmentName()));
+
             employee.setDepartment(dept);
         }
 
@@ -71,6 +74,7 @@ public class EmployeeServices {
         Employee existingEmployee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFound("Cannot update. Employee not found with id: " + id));
 
+
         // Check if email belongs to another employee
         employeeRepository.findByEmail(updatedDto.getEmail())
                 .ifPresent(emp -> {
@@ -82,6 +86,17 @@ public class EmployeeServices {
         existingEmployee.setName(updatedDto.getName());
         existingEmployee.setEmail(updatedDto.getEmail());
         existingEmployee.setPhone(updatedDto.getPhone());
+        existingEmployee.setDesignation(updatedDto.getDesignation());
+        // write here
+        if (updatedDto.getDepartmentName() != null) {
+            Department department = departmentRepository
+                    .findByDepartmentName(updatedDto.getDepartmentName())
+                    .orElseThrow(() -> new ResourceNotFound(
+                            "Department not found: " + updatedDto.getDepartmentName()));
+
+            existingEmployee.setDepartment(department);
+        }
+
 
         Employee savedEmployee = employeeRepository.save(existingEmployee);
         return EmployeeMapper.mapToEmployeeDto(savedEmployee);
@@ -94,6 +109,7 @@ public class EmployeeServices {
 
         Department department = departmentRepository.findById(departmentId)
                 .orElseThrow(() -> new ResourceNotFound("Department not found with id: " + departmentId));
+
 
         employee.setDepartment(department);
         Employee savedEmployee = employeeRepository.save(employee);

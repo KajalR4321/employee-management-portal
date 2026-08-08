@@ -32,7 +32,7 @@ public class Employee {
 
     @Enumerated(EnumType.STRING)
     private EmployeeStatus status;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "department_id")
     private Department department;
 

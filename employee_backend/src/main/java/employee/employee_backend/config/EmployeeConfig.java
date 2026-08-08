@@ -18,12 +18,18 @@ public class EmployeeConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-            http.csrf(csrf -> csrf.disable())
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/api/employees/**", "/api/leaves/**").permitAll() // 👈 ADD /api/leaves/** HERE
-                            .anyRequest().authenticated()
-                    );
-            return http.build();
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/employees/**",
+                                "/api/departments/**",
+                                "/api/leaves/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                );
+
+        return http.build();
+
     }
 
     @Bean

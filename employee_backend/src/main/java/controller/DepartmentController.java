@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/departments")
+@CrossOrigin(origins = "*") // Allows React on port 5173/3000 to talk to Java
 @RequiredArgsConstructor
 public class DepartmentController {
 

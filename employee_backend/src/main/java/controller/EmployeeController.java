@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/employees")
+@CrossOrigin(origins = "*")// <-- Add this to allow requests from React
 @RequiredArgsConstructor
 public class EmployeeController {
 
