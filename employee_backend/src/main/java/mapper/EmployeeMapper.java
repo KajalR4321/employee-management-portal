@@ -5,37 +5,60 @@ import entity.Employee;
 
 public class EmployeeMapper {
 
-    // 1. Converts Employee Entity -> EmployeeDto
+    // Employee Entity -> EmployeeDto
     public static EmployeeDto mapToEmployeeDto(Employee employee) {
+
         if (employee == null) {
             return null;
         }
 
-        return new EmployeeDto(
-                employee.getId(),
-                employee.getName(),
-                employee.getEmail(),
-                employee.getPhone(),
-                employee.getDesignation(),
+        EmployeeDto dto = new EmployeeDto();
 
-                employee.getDepartment() != null ? employee.getDepartment().getId() : null,
-                employee.getDepartment() != null ? employee.getDepartment().getDepartmentName() : null
+        dto.setId(employee.getId());
+        dto.setName(employee.getName());
+        dto.setEmail(employee.getEmail());
+        dto.setPhone(employee.getPhone());
+        dto.setDesignation(employee.getDesignation());
+        dto.setJoiningDate(employee.getJoiningDate());
 
-        );
+        // Department details
+        if (employee.getDepartment() != null) {
+            dto.setDepartmentId(employee.getDepartment().getId());
+            dto.setDepartmentName(
+                    employee.getDepartment().getDepartmentName()
+            );
+        } else {
+            dto.setDepartmentId(null);
+            dto.setDepartmentName(null);
+        }
+
+        return dto;
     }
 
-    // 2. Converts EmployeeDto -> Employee Entity
+    // EmployeeDto -> Employee Entity
     public static Employee mapToEmployee(EmployeeDto employeeDto) {
+
         if (employeeDto == null) {
             return null;
         }
 
         Employee employee = new Employee();
+
         employee.setId(employeeDto.getId());
         employee.setName(employeeDto.getName());
         employee.setEmail(employeeDto.getEmail());
         employee.setPhone(employeeDto.getPhone());
         employee.setDesignation(employeeDto.getDesignation());
+        employee.setJoiningDate(employeeDto.getJoiningDate());
+
+        /*
+         * Department is NOT set here.
+         *
+         * EmployeeServices finds the existing Department
+         * and sets it using:
+         *
+         * employee.setDepartment(department);
+         */
 
         return employee;
     }

@@ -75,4 +75,91 @@ public class LeaveRequestServices {
         LeaveRequest updatedRequest = leaveRequestRepository.save(leaveRequest);
         return LeaveRequestMapper.mapToLeaveRequestDto(updatedRequest);
     }
+    // =====================================================
+    // 6. EDIT / UPDATE LEAVE REQUEST
+    // =====================================================
+
+    public LeaveRequestDto updateLeaveRequest(
+            Long leaveId,
+            LeaveRequestDto dto) {
+
+        // Find existing leave
+        LeaveRequest existingLeave =
+                leaveRequestRepository.findById(leaveId)
+                        .orElseThrow(() ->
+                                new ResourceNotFound(
+                                        "Leave request not found with id: "
+                                                + leaveId
+                                )
+                        );
+
+        // Only PENDING leave can be edited
+        if (existingLeave.getStatus() != LeaveStatus.PENDING) {
+            throw new RuntimeException(
+                    "Only pending leave requests can be edited"
+            );
+        }
+
+        // Validate dates
+        if (dto.getEndDate().isBefore(dto.getStartDate())) {
+            throw new RuntimeException(
+                    "End date cannot be before start date"
+            );
+        }
+
+        // Find employee
+        Employee employee =
+                employeeRepository.findById(dto.getEmployeeId())
+                        .orElseThrow(() ->
+                                new ResourceNotFound(
+                                        "Employee not found with id: "
+                                                + dto.getEmployeeId()
+                                )
+                        );
+
+        // Update leave information
+        existingLeave.setLeaveType(dto.getLeaveType());
+        existingLeave.setStartDate(dto.getStartDate());
+        existingLeave.setEndDate(dto.getEndDate());
+        existingLeave.setReason(dto.getReason());
+
+        // Set employee
+        existingLeave.setEmployee(employee);
+
+        // Keep status PENDING
+        existingLeave.setStatus(LeaveStatus.PENDING);
+
+        LeaveRequest updatedLeave =
+                leaveRequestRepository.save(existingLeave);
+
+        return LeaveRequestMapper
+                .mapToLeaveRequestDto(updatedLeave);
+    }
+
+
+    // =====================================================
+    // 7. DELETE LEAVE REQUEST
+    // =====================================================
+
+    public void deleteLeaveRequest(Long leaveId) {
+
+        // Find leave first
+        LeaveRequest existingLeave =
+                leaveRequestRepository.findById(leaveId)
+                        .orElseThrow(() ->
+                                new ResourceNotFound(
+                                        "Leave request not found with id: "
+                                                + leaveId
+                                )
+                        );
+
+        // Only PENDING leave can be deleted
+        if (existingLeave.getStatus() != LeaveStatus.PENDING) {
+            throw new RuntimeException(
+                    "Only pending leave requests can be deleted"
+            );
+        }
+
+        leaveRequestRepository.delete(existingLeave);
+    }
 }

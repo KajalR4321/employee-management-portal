@@ -50,4 +50,45 @@ public class LeaveRequestController {
             @RequestParam LeaveStatus status) {
         return ResponseEntity.ok(leaveRequestService.updateLeaveStatus(leaveId, status));
     }
+    // =====================================================
+    // 5. EDIT / UPDATE LEAVE REQUEST
+    // PUT http://localhost:8000/api/leaves/1
+    // =====================================================
+
+    @PutMapping("/{leaveId}")
+    public ResponseEntity<LeaveRequestDto>
+    updateLeaveRequest(
+            @PathVariable Long leaveId,
+            @Valid @RequestBody LeaveRequestDto leaveRequestDto) {
+
+        LeaveRequestDto updatedLeave =
+                leaveRequestService.updateLeaveRequest(
+                        leaveId,
+                        leaveRequestDto
+                );
+
+        return ResponseEntity.ok(updatedLeave);
+    }
+
+
+
+
+
+    // =====================================================
+    // 7. DELETE LEAVE REQUEST
+    // DELETE http://localhost:8000/api/leaves/1
+    // =====================================================
+
+    @DeleteMapping("/{leaveId}")
+    public ResponseEntity<String>
+    deleteLeaveRequest(
+            @PathVariable Long leaveId) {
+
+        leaveRequestService.deleteLeaveRequest(leaveId);
+
+        return ResponseEntity.ok(
+                "Leave request deleted successfully with id: "
+                        + leaveId
+        );
+    }
 }

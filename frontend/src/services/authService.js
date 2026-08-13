@@ -4,36 +4,53 @@ const TOKEN_KEY = 'jwt_token';
 const USER_KEY = 'user_data';
 
 export const authService = {
-    /**
-     * Authenticate user with credentials & store access token
-     * @param {Object} credentials - { email, password }
-     */
+
     async login(credentials) {
-        const response = await api.post('/auth/login', credentials);
-        const { token, user } = response.data;
+        try {
+            const response = await api.post('/auth/login', {
+                email: credentials.email,
+                password: credentials.password
+            });
 
-        if (token) {
-            localStorage.setItem(TOKEN_KEY, token);
-            localStorage.setItem(USER_KEY, JSON.stringify(user));
+            const { token, user } = response.data;
+
+            // Store token if backend provides one
+            if (token) {
+                localStorage.setItem(TOKEN_KEY, token);
+            }
+
+            // Store user
+            if (user) {
+                localStorage.setItem(USER_KEY, JSON.stringify(user));
+            }
+
+            return {
+                token: token || null,
+                user: user || null
+            };
+
+        } catch (error) {
+            console.error(
+                'Login API Error:',
+                error.response?.data || error.message
+            );
+
+            throw error;
         }
-
-        return { token, user };
     },
 
-    /**
-     * Clear active user session & remove stored tokens
-     */
     logout() {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USER_KEY);
     },
 
-    /**
-     * Retrieve currently saved user session
-     */
     getCurrentUser() {
         const userStr = localStorage.getItem(USER_KEY);
-        if (!userStr) return null;
+
+        if (!userStr) {
+            return null;
+        }
+
         try {
             return JSON.parse(userStr);
         } catch {
@@ -41,16 +58,10 @@ export const authService = {
         }
     },
 
-    /**
-     * Get JWT bearer token for API authorization
-     */
     getToken() {
         return localStorage.getItem(TOKEN_KEY);
     },
 
-    /**
-     * Verify if a user session token exists
-     */
     isAuthenticated() {
         return !!this.getToken();
     }

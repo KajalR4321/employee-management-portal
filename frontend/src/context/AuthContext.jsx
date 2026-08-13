@@ -6,12 +6,22 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Load saved user and validate storage on app start
+    // Formats user object so employeeId is always available
+    const formatUser = (userData) => {
+        if (!userData) return null;
+        return {
+            ...userData,
+            employeeId: userData.employeeId || userData._id || userData.id || userData.employee_id
+        };
+    };
+
+    // Load saved user on app start
     useEffect(() => {
         try {
             const savedUser = localStorage.getItem('ems_user');
             if (savedUser && savedUser !== 'undefined') {
-                setUser(JSON.parse(savedUser));
+                const parsed = JSON.parse(savedUser);
+                setUser(formatUser(parsed));
             }
         } catch (error) {
             console.error('Failed to parse auth user:', error);
@@ -22,21 +32,22 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    // Login Handler: Save user info & auth tokens
+    // Login Handler
     const login = (userData, token = null) => {
-        setUser(userData);
-        localStorage.setItem('ems_user', JSON.stringify(userData));
+        const formatted = formatUser(userData);
+        setUser(formatted);
+        localStorage.setItem('ems_user', JSON.stringify(formatted));
         if (token) {
             localStorage.setItem('ems_token', token);
         }
     };
 
-    // Logout Handler: Wipe all stored credentials completely
+    // Logout Handler
     const logout = () => {
         setUser(null);
         localStorage.removeItem('ems_user');
         localStorage.removeItem('ems_token');
-        localStorage.clear(); // Prevents lingering auth keys
+        localStorage.clear();
     };
 
     return (
